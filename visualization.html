@@ -201,9 +201,10 @@
     </div>
 
     <script>
-        // スプレッドシートのID
+        // スプレッドシートのID（実際のスプレッドシートに更新済み）
         const SPREADSHEET_ID = '1dezZlEhubpUsrMLs5NmoDU_Nb_1QUbaPHCQ3-bO44qw';
-        const SHEET_NAME = 'シート1';
+        const SHEET_NAME = 'シート1'; // シート名を修正
+        const API_KEY = 'AIzaSyBHXYwfKNRFl1W-6X9b_2HS6J_ZflFMYJQ'; // 新しいAPIキー
         
         // 時間帯の順序を定義
         const timeSlotOrder = [
@@ -230,16 +231,29 @@
             error.style.display = 'none';
             content.style.display = 'none';
             
+            console.log('Starting data load...'); // デバッグ追加
+            
             try {
                 // Google Sheets APIを使用してデータを取得
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=AIzaSyDDbfUy7zDH6jzoxrQjIj1VbGBKCz_jGUE`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}?key=${API_KEY}`;
+                
+                console.log('Fetching from:', url); // デバッグ用
+                console.log('Spreadsheet ID:', SPREADSHEET_ID);
+                console.log('Sheet Name:', SHEET_NAME);
                 
                 const response = await fetch(url);
+                console.log('Response status:', response.status); // デバッグ追加
+                
+                const responseText = await response.text();
+                console.log('Response text:', responseText); // デバッグ追加
+                
                 if (!response.ok) {
-                    throw new Error('データの取得に失敗しました');
+                    console.error('API Response:', responseText); // デバッグ用
+                    throw new Error('データの取得に失敗しました。スプレッドシートの共有設定を確認してください。');
                 }
                 
-                const data = await response.json();
+                const data = JSON.parse(responseText);
+                console.log('Parsed data:', data); // デバッグ追加
                 const rows = data.values;
                 
                 if (!rows || rows.length < 2) {
