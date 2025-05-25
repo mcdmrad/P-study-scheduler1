@@ -235,7 +235,7 @@
             
             try {
                 // Google Sheets APIを使用してデータを取得
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}?key=${API_KEY}`;
+                const url = WEB_APP_URL + '?action=getData';
                 
                 console.log('Fetching from:', url); // デバッグ用
                 console.log('Spreadsheet ID:', SPREADSHEET_ID);
