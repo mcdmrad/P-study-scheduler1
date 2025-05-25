@@ -320,26 +320,42 @@
                         return;
                     }
                     
-                    // 送信結果を表示（実際の実装では、ここでサーバーに送信）
-                    console.log('送信データ:', data);
+                    // Googleスプレッドシートに送信
+                    var submitBtn = document.querySelector('.submit-btn');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '送信中...';
                     
-                    // 確認メッセージ
-                    let message = '以下の内容で送信しました：\n\n';
-                    message += 'お名前: ' + data.name + '\n\n';
-                    message += 'ご都合の良い日時:\n';
-                    
-                    data.availability.forEach(function(item) {
-                        message += item.day + ': ' + item.times.join(', ') + '\n';
+                    fetch('https://script.google.com/macros/s/AKfycbwEFPNcv-UKzcikRiObwzHGam7hfWCqySUWdJbQtjNsng9jcRTnk9lLzzs5T-Waj52k/exec', {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(function() {
+                        // 成功メッセージ
+                        alert('回答を送信しました！\n\nGoogleスプレッドシートで結果を確認できます。');
+                        
+                        // フォームをリセット
+                        document.getElementById('availabilityForm').reset();
+                        
+                        // 追加した曜日グループを削除（最初の1つだけ残す）
+                        var groups = document.querySelectorAll('.day-time-group');
+                        for (var i = 1; i < groups.length; i++) {
+                            groups[i].remove();
+                        }
+                        
+                        // ボタンを元に戻す
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '送信';
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                        alert('送信中にエラーが発生しました。もう一度お試しください。');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '送信';
                     });
-                    
-                    if (data.comments) {
-                        message += '\nコメント: ' + data.comments;
-                    }
-                    
-                    alert(message);
-                    
-                    // フォームをリセット（必要に応じて）
-                    // this.reset();
                 });
             });
         })();
