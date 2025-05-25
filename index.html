@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スケジュール調整結果</title>
+    <title>都合の良い日時アンケート</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
         }
-        .container {
+        .form-container {
             background: white;
             padding: 30px;
             border-radius: 10px;
@@ -20,120 +20,60 @@
         }
         h1 {
             color: #333;
-            text-align: center;
             margin-bottom: 30px;
+            text-align: center;
         }
-        h2 {
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
             color: #555;
-            margin-top: 40px;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .day-time-container {
             margin-bottom: 20px;
         }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 18px;
-            color: #666;
-        }
-        .error {
-            background: #fee;
-            color: #c33;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-        .time-slot-card {
+        .day-time-group {
             background: #f9f9f9;
-            padding: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
             border-radius: 8px;
-            border: 2px solid #e0e0e0;
-            text-align: center;
-            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
         }
-        .time-slot-card.best {
-            background: #e8f5e9;
-            border-color: #4CAF50;
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+        .day-select {
+            margin-bottom: 10px;
         }
-        .time-slot-card.good {
-            background: #fff3e0;
-            border-color: #ff9800;
-        }
-        .time-slot-card h3 {
-            margin: 0 0 10px 0;
-            color: #333;
-        }
-        .count {
-            font-size: 36px;
-            font-weight: bold;
-            color: #2196F3;
-            margin: 10px 0;
-        }
-        .best .count {
-            color: #4CAF50;
-        }
-        .participants {
-            font-size: 12px;
-            color: #666;
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
             margin-top: 10px;
         }
-        .availability-table {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        th {
-            background: #f5f5f5;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        td.available {
-            background: #e8f5e9;
-            text-align: center;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-        td.not-available {
-            background: #fafafa;
-            text-align: center;
-            color: #ccc;
-        }
-        .legend {
-            margin-top: 20px;
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .legend-item {
+        .time-slot {
             display: flex;
             align-items: center;
-            gap: 8px;
+            padding: 5px;
         }
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+        .time-slot input[type="checkbox"] {
+            margin-right: 8px;
         }
-        .refresh-btn {
-            background: #2196F3;
+        .add-day-btn {
+            background: #4CAF50;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -142,275 +82,283 @@
             font-size: 16px;
             margin-bottom: 20px;
         }
-        .refresh-btn:hover {
+        .add-day-btn:hover {
+            background: #45a049;
+        }
+        .remove-day-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            float: right;
+        }
+        .remove-day-btn:hover {
+            background: #da190b;
+        }
+        .submit-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .submit-btn:hover {
             background: #1976D2;
         }
-        .last-updated {
-            text-align: center;
-            color: #666;
+        .help-text {
             font-size: 14px;
-            margin-top: 20px;
+            color: #666;
+            margin-top: 5px;
+        }
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background: white;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>スケジュール調整結果</h1>
-        
-        <button class="refresh-btn" onclick="loadData()">データを更新</button>
-        
-        <div id="loading" class="loading">データを読み込んでいます...</div>
-        <div id="error" class="error" style="display: none;"></div>
-        
-        <div id="content" style="display: none;">
-            <h2>時間帯別 参加可能人数</h2>
-            <div id="summaryGrid" class="summary-grid"></div>
+    <div class="form-container">
+        <h1>都合の良い日時を教えてください</h1>
+        <form id="availabilityForm">
+            <div class="form-group">
+                <label for="name">お名前 <span style="color: red;">*</span></label>
+                <input type="text" id="name" name="name" required>
+            </div>
             
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #e8f5e9; border-color: #4CAF50;"></div>
-                    <span>最も多い（ベスト）</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #fff3e0; border-color: #ff9800;"></div>
-                    <span>比較的多い</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #f9f9f9;"></div>
-                    <span>通常</span>
+            <div class="form-group">
+                <label>ご都合の良い曜日と時間帯 <span style="color: red;">*</span></label>
+                <p class="help-text">曜日ごとに都合の良い時間帯を選択してください。複数の曜日を追加できます。</p>
+                
+                <button type="button" class="add-day-btn" id="addDayBtn">+ 曜日を追加</button>
+                
+                <div id="dayTimeContainer" class="day-time-container">
+                    <!-- 初期表示で1つの曜日グループを表示 -->
+                    <div class="day-time-group" data-group-id="1">
+                        <button type="button" class="remove-day-btn">削除</button>
+                        <div class="day-select">
+                            <label>曜日を選択:</label>
+                            <select name="day_1" required>
+                                <option value="">選択してください</option>
+                                <option value="月曜日">月曜日</option>
+                                <option value="火曜日">火曜日</option>
+                                <option value="水曜日">水曜日</option>
+                                <option value="木曜日">木曜日</option>
+                                <option value="金曜日">金曜日</option>
+                                <option value="土曜日">土曜日</option>
+                                <option value="日曜日">日曜日</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>時間帯を選択:</label>
+                            <div class="time-slots">
+                                <label class="time-slot">
+                                    <input type="checkbox" name="time_1" value="7:00-8:00">
+                                    7:00-8:00
+                                </label>
+                                <label class="time-slot">
+                                    <input type="checkbox" name="time_1" value="7:30-8:30">
+                                    7:30-8:30
+                                </label>
+                                <label class="time-slot">
+                                    <input type="checkbox" name="time_1" value="8:00-9:00">
+                                    8:00-9:00
+                                </label>
+                                <label class="time-slot">
+                                    <input type="checkbox" name="time_1" value="8:30-9:30">
+                                    8:30-9:30
+                                </label>
+                                <label class="time-slot">
+                                    <input type="checkbox" name="time_1" value="9:00-10:00">
+                                    9:00-10:00
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <h2>参加者別 都合の良い時間帯</h2>
-            <div class="availability-table">
-                <table id="availabilityTable">
-                    <thead>
-                        <tr id="tableHeader">
-                            <th>参加者</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                    </tbody>
-                </table>
+            <div class="form-group">
+                <label for="comments">その他ご要望・コメント</label>
+                <textarea id="comments" name="comments" placeholder="特定の日程で都合が悪い日や、その他のご要望があればお書きください"></textarea>
             </div>
             
-            <div class="last-updated">
-                最終更新: <span id="lastUpdated"></span>
-            </div>
-        </div>
+            <button type="submit" class="submit-btn">送信</button>
+        </form>
     </div>
 
     <script>
-        // スプレッドシートのID（実際のスプレッドシートに更新済み）
-        const SPREADSHEET_ID = '1dezZlEhubpUsrMLs5NmoDU_Nb_1QUbaPHCQ3-bO44qw';
-        const SHEET_NAME = 'シート1'; // シート名を修正
-        const API_KEY = 'AIzaSyBHXYwfKNRFl1W-6X9b_2HS6J_ZflFMYJQ'; // 新しいAPIキー
-        
-        // 時間帯の順序を定義
-        const timeSlotOrder = [
-            '7:00-8:00',
-            '7:30-8:30',
-            '8:00-9:00',
-            '8:30-9:30',
-            '9:00-10:00'
-        ];
-        
-        // 曜日の順序を定義
-        const dayOrder = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日'];
-        
-        function createDayTimeKey(day, time) {
-            return `${day}: ${time}`;
-        }
-        
-        async function loadData() {
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-            const content = document.getElementById('content');
-            
-            loading.style.display = 'block';
-            error.style.display = 'none';
-            content.style.display = 'none';
-            
-            try {
-                // Google Sheets APIを使用してデータを取得
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}?key=${API_KEY}`;
+        (function() {
+            let groupCounter = 1;
+
+            // 曜日を追加する関数
+            function addDayTimeGroup() {
+                groupCounter++;
+                const container = document.getElementById('dayTimeContainer');
+                const newGroup = document.createElement('div');
+                newGroup.className = 'day-time-group';
+                newGroup.setAttribute('data-group-id', groupCounter);
                 
-                console.log('Fetching from:', url); // デバッグ用
+                newGroup.innerHTML = `
+                    <button type="button" class="remove-day-btn">削除</button>
+                    <div class="day-select">
+                        <label>曜日を選択:</label>
+                        <select name="day_${groupCounter}" required>
+                            <option value="">選択してください</option>
+                            <option value="月曜日">月曜日</option>
+                            <option value="火曜日">火曜日</option>
+                            <option value="水曜日">水曜日</option>
+                            <option value="木曜日">木曜日</option>
+                            <option value="金曜日">金曜日</option>
+                            <option value="土曜日">土曜日</option>
+                            <option value="日曜日">日曜日</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>時間帯を選択:</label>
+                        <div class="time-slots">
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="7:00-8:00">
+                                7:00-8:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="7:30-8:30">
+                                7:30-8:30
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="8:00-9:00">
+                                8:00-9:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="8:30-9:30">
+                                8:30-9:30
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="9:00-10:00">
+                                9:00-10:00
+                            </label>
+                        </div>
+                    </div>
+                `;
                 
-                const response = await fetch(url);
-                const responseText = await response.text();
+                container.appendChild(newGroup);
                 
-                if (!response.ok) {
-                    console.error('API Response:', responseText); // デバッグ用
-                    throw new Error('データの取得に失敗しました。スプレッドシートの共有設定を確認してください。');
-                }
-                
-                const data = JSON.parse(responseText);
-                const rows = data.values;
-                
-                if (!rows || rows.length < 2) {
-                    throw new Error('データが見つかりません');
-                }
-                
-                // ヘッダーを除いてデータを処理
-                const participants = [];
-                for (let i = 1; i < rows.length; i++) {
-                    if (rows[i][1]) { // 名前がある行のみ処理
-                        participants.push({
-                            name: rows[i][1],
-                            availability: rows[i][2] || '',
-                            comments: rows[i][3] || ''
-                        });
-                    }
-                }
-                
-                // データを解析して可視化
-                visualizeData(participants);
-                
-                // 最終更新時刻を表示
-                document.getElementById('lastUpdated').textContent = new Date().toLocaleString('ja-JP');
-                
-                loading.style.display = 'none';
-                content.style.display = 'block';
-                
-            } catch (err) {
-                loading.style.display = 'none';
-                error.style.display = 'block';
-                error.textContent = 'エラー: ' + err.message;
+                // 新しく追加された削除ボタンにイベントリスナーを追加
+                const removeBtn = newGroup.querySelector('.remove-day-btn');
+                removeBtn.addEventListener('click', function() {
+                    removeDayTimeGroup(this);
+                });
             }
-        }
-        
-        function parseAvailability(availabilityText) {
-            const slots = [];
-            if (!availabilityText) return slots;
-            
-            // "月曜日: 7:00-8:00, 8:00-9:00; 火曜日: 9:00-10:00" のような形式をパース
-            const dayParts = availabilityText.split(';');
-            
-            dayParts.forEach(dayPart => {
-                const parts = dayPart.trim().split(':');
-                if (parts.length >= 2) {
-                    const day = parts[0].trim();
-                    const timesPart = parts.slice(1).join(':').trim();
-                    const times = timesPart.split(',').map(t => t.trim());
+
+            // 曜日グループを削除する関数
+            function removeDayTimeGroup(button) {
+                const group = button.closest('.day-time-group');
+                const container = document.getElementById('dayTimeContainer');
+                
+                // 最低1つはグループを残す
+                if (container.querySelectorAll('.day-time-group').length > 1) {
+                    group.remove();
+                } else {
+                    alert('最低1つの曜日は選択してください。');
+                }
+            }
+
+            // ページ読み込み時の初期化
+            document.addEventListener('DOMContentLoaded', function() {
+                // 曜日追加ボタンのイベントリスナー
+                document.getElementById('addDayBtn').addEventListener('click', addDayTimeGroup);
+
+                // 初期の削除ボタンのイベントリスナー
+                document.querySelectorAll('.remove-day-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        removeDayTimeGroup(this);
+                    });
+                });
+
+                // フォーム送信のイベントリスナー
+                document.getElementById('availabilityForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
                     
-                    times.forEach(time => {
-                        if (time) {
-                            slots.push({
+                    // フォームデータを収集
+                    const formData = new FormData(this);
+                    const data = {
+                        name: formData.get('name'),
+                        availability: [],
+                        comments: formData.get('comments')
+                    };
+                    
+                    // 各曜日グループのデータを収集
+                    const groups = document.querySelectorAll('.day-time-group');
+                    let hasValidSelection = false;
+                    
+                    groups.forEach(function(group) {
+                        const groupId = group.getAttribute('data-group-id');
+                        const day = formData.get('day_' + groupId);
+                        const times = formData.getAll('time_' + groupId);
+                        
+                        if (day && times.length > 0) {
+                            hasValidSelection = true;
+                            data.availability.push({
                                 day: day,
-                                time: time,
-                                key: createDayTimeKey(day, time)
+                                times: times
                             });
                         }
                     });
-                }
-            });
-            
-            return slots;
-        }
-        
-        function visualizeData(participants) {
-            // 時間帯別の集計
-            const timeSlotCounts = {};
-            const timeSlotParticipants = {};
-            
-            // 全ての曜日と時間帯の組み合わせを初期化
-            dayOrder.forEach(day => {
-                timeSlotOrder.forEach(time => {
-                    const key = createDayTimeKey(day, time);
-                    timeSlotCounts[key] = 0;
-                    timeSlotParticipants[key] = [];
-                });
-            });
-            
-            // 参加者のデータを解析
-            participants.forEach(participant => {
-                const slots = parseAvailability(participant.availability);
-                slots.forEach(slot => {
-                    if (timeSlotCounts.hasOwnProperty(slot.key)) {
-                        timeSlotCounts[slot.key]++;
-                        timeSlotParticipants[slot.key].push(participant.name);
-                    }
-                });
-            });
-            
-            // 最大参加者数を見つける
-            const maxCount = Math.max(...Object.values(timeSlotCounts));
-            
-            // サマリーグリッドを作成
-            const summaryGrid = document.getElementById('summaryGrid');
-            summaryGrid.innerHTML = '';
-            
-            // 曜日ごとにグループ化して表示
-            dayOrder.forEach(day => {
-                timeSlotOrder.forEach(time => {
-                    const key = createDayTimeKey(day, time);
-                    const count = timeSlotCounts[key];
-                    const participantsList = timeSlotParticipants[key];
                     
-                    const card = document.createElement('div');
-                    card.className = 'time-slot-card';
-                    
-                    if (count === maxCount && count > 0) {
-                        card.className += ' best';
-                    } else if (count >= maxCount * 0.7 && count > 0) {
-                        card.className += ' good';
+                    // バリデーション
+                    if (!hasValidSelection) {
+                        alert('少なくとも1つの曜日と時間帯を選択してください。');
+                        return;
                     }
                     
-                    card.innerHTML = `
-                        <h3>${key}</h3>
-                        <div class="count">${count}人</div>
-                        <div class="participants">${participantsList.join(', ') || '-'}</div>
-                    `;
+                    // Googleスプレッドシートに送信
+                    var submitBtn = document.querySelector('.submit-btn');
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '送信中...';
                     
-                    summaryGrid.appendChild(card);
-                });
-            });
-            
-            // 参加者別テーブルを作成
-            const tableHeader = document.getElementById('tableHeader');
-            const tableBody = document.getElementById('tableBody');
-            
-            // ヘッダーを作成
-            tableHeader.innerHTML = '<th>参加者</th>';
-            dayOrder.forEach(day => {
-                timeSlotOrder.forEach(time => {
-                    tableHeader.innerHTML += `<th>${day}<br>${time}</th>`;
-                });
-            });
-            
-            // 各参加者の行を作成
-            tableBody.innerHTML = '';
-            participants.forEach(participant => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td><strong>${participant.name}</strong></td>`;
-                
-                const participantSlots = parseAvailability(participant.availability);
-                const slotKeys = participantSlots.map(s => s.key);
-                
-                dayOrder.forEach(day => {
-                    timeSlotOrder.forEach(time => {
-                        const key = createDayTimeKey(day, time);
-                        const cell = document.createElement('td');
+                    fetch('https://script.google.com/macros/s/AKfycbwEFPNcv-UKzcikRiObwzHGam7hfWCqySUWdJbQtjNsng9jcRTnk9lLzzs5T-Waj52k/exec', {
+                        method: 'POST',
+                        redirect: 'follow',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(function(response) {
+                        // 成功メッセージ
+                        alert('回答を送信しました！\n\nGoogleスプレッドシートで結果を確認できます。');
                         
-                        if (slotKeys.includes(key)) {
-                            cell.className = 'available';
-                            cell.innerHTML = '◯';
-                        } else {
-                            cell.className = 'not-available';
-                            cell.innerHTML = '-';
+                        // フォームをリセット
+                        document.getElementById('availabilityForm').reset();
+                        
+                        // 追加した曜日グループを削除（最初の1つだけ残す）
+                        var groups = document.querySelectorAll('.day-time-group');
+                        for (var i = 1; i < groups.length; i++) {
+                            groups[i].remove();
                         }
                         
-                        row.appendChild(cell);
+                        // ボタンを元に戻す
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '送信';
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                        alert('送信中にエラーが発生しました。もう一度お試しください。');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '送信';
                     });
                 });
-                
-                tableBody.appendChild(row);
             });
-        }
-        
-        // ページ読み込み時にデータを取得
-        window.addEventListener('load', loadData);
+        })();
     </script>
 </body>
 </html>
