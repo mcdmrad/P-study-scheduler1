@@ -33,7 +33,6 @@
             color: #555;
         }
         input[type="text"],
-        input[type="email"],
         textarea {
             width: 100%;
             padding: 10px;
@@ -140,12 +139,12 @@
                 <label>ご都合の良い曜日と時間帯 <span style="color: red;">*</span></label>
                 <p class="help-text">曜日ごとに都合の良い時間帯を選択してください。複数の曜日を追加できます。</p>
                 
-                <button type="button" class="add-day-btn" onclick="addDayTimeGroup()">+ 曜日を追加</button>
+                <button type="button" class="add-day-btn" id="addDayBtn">+ 曜日を追加</button>
                 
                 <div id="dayTimeContainer" class="day-time-container">
                     <!-- 初期表示で1つの曜日グループを表示 -->
                     <div class="day-time-group" data-group-id="1">
-                        <button type="button" class="remove-day-btn" onclick="removeDayTimeGroup(this)">削除</button>
+                        <button type="button" class="remove-day-btn">削除</button>
                         <div class="day-select">
                             <label>曜日を選択:</label>
                             <select name="day_1" required>
@@ -238,168 +237,192 @@
     </div>
 
     <script>
-        let groupCounter = 1;
+        (function() {
+            let groupCounter = 1;
 
-        function addDayTimeGroup() {
-            groupCounter++;
-            const container = document.getElementById('dayTimeContainer');
-            const newGroup = document.createElement('div');
-            newGroup.className = 'day-time-group';
-            newGroup.setAttribute('data-group-id', groupCounter);
-            
-            newGroup.innerHTML = `
-                <button type="button" class="remove-day-btn" onclick="removeDayTimeGroup(this)">削除</button>
-                <div class="day-select">
-                    <label>曜日を選択:</label>
-                    <select name="day_${groupCounter}" required>
-                        <option value="">選択してください</option>
-                        <option value="月曜日">月曜日</option>
-                        <option value="火曜日">火曜日</option>
-                        <option value="水曜日">水曜日</option>
-                        <option value="木曜日">木曜日</option>
-                        <option value="金曜日">金曜日</option>
-                        <option value="土曜日">土曜日</option>
-                        <option value="日曜日">日曜日</option>
-                    </select>
-                </div>
-                <div>
-                    <label>時間帯を選択:</label>
-                    <div class="time-slots">
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="7:00-8:00">
-                            7:00-8:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="8:00-9:00">
-                            8:00-9:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="9:00-10:00">
-                            9:00-10:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="10:00-11:00">
-                            10:00-11:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="11:00-12:00">
-                            11:00-12:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="12:00-13:00">
-                            12:00-13:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="13:00-14:00">
-                            13:00-14:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="14:00-15:00">
-                            14:00-15:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="15:00-16:00">
-                            15:00-16:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="16:00-17:00">
-                            16:00-17:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="17:00-18:00">
-                            17:00-18:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="18:00-19:00">
-                            18:00-19:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="19:00-20:00">
-                            19:00-20:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="20:00-21:00">
-                            20:00-21:00
-                        </label>
-                        <label class="time-slot">
-                            <input type="checkbox" name="time_${groupCounter}" value="21:00-22:00">
-                            21:00-22:00
-                        </label>
-                    </div>
-                </div>
-            `;
-            
-            container.appendChild(newGroup);
-        }
-
-        function removeDayTimeGroup(button) {
-            const group = button.closest('.day-time-group');
-            const container = document.getElementById('dayTimeContainer');
-            
-            // 最低1つはグループを残す
-            if (container.querySelectorAll('.day-time-group').length > 1) {
-                group.remove();
-            } else {
-                alert('最低1つの曜日は選択してください。');
-            }
-        }
-
-        document.getElementById('availabilityForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // フォームデータを収集
-            const formData = new FormData(this);
-            const data = {
-                name: formData.get('name'),
-                availability: [],
-                comments: formData.get('comments')
-            };
-            
-            // 各曜日グループのデータを収集
-            const groups = document.querySelectorAll('.day-time-group');
-            let hasValidSelection = false;
-            
-            groups.forEach(group => {
-                const groupId = group.getAttribute('data-group-id');
-                const day = formData.get(`day_${groupId}`);
-                const times = formData.getAll(`time_${groupId}`);
+            // 曜日を追加する関数
+            function addDayTimeGroup() {
+                groupCounter++;
+                const container = document.getElementById('dayTimeContainer');
+                const newGroup = document.createElement('div');
+                newGroup.className = 'day-time-group';
+                newGroup.setAttribute('data-group-id', groupCounter);
                 
-                if (day && times.length > 0) {
-                    hasValidSelection = true;
-                    data.availability.push({
-                        day: day,
-                        times: times
-                    });
+                newGroup.innerHTML = `
+                    <button type="button" class="remove-day-btn">削除</button>
+                    <div class="day-select">
+                        <label>曜日を選択:</label>
+                        <select name="day_${groupCounter}" required>
+                            <option value="">選択してください</option>
+                            <option value="月曜日">月曜日</option>
+                            <option value="火曜日">火曜日</option>
+                            <option value="水曜日">水曜日</option>
+                            <option value="木曜日">木曜日</option>
+                            <option value="金曜日">金曜日</option>
+                            <option value="土曜日">土曜日</option>
+                            <option value="日曜日">日曜日</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>時間帯を選択:</label>
+                        <div class="time-slots">
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="7:00-8:00">
+                                7:00-8:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="8:00-9:00">
+                                8:00-9:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="9:00-10:00">
+                                9:00-10:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="10:00-11:00">
+                                10:00-11:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="11:00-12:00">
+                                11:00-12:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="12:00-13:00">
+                                12:00-13:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="13:00-14:00">
+                                13:00-14:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="14:00-15:00">
+                                14:00-15:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="15:00-16:00">
+                                15:00-16:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="16:00-17:00">
+                                16:00-17:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="17:00-18:00">
+                                17:00-18:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="18:00-19:00">
+                                18:00-19:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="19:00-20:00">
+                                19:00-20:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="20:00-21:00">
+                                20:00-21:00
+                            </label>
+                            <label class="time-slot">
+                                <input type="checkbox" name="time_${groupCounter}" value="21:00-22:00">
+                                21:00-22:00
+                            </label>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(newGroup);
+                
+                // 新しく追加された削除ボタンにイベントリスナーを追加
+                const removeBtn = newGroup.querySelector('.remove-day-btn');
+                removeBtn.addEventListener('click', function() {
+                    removeDayTimeGroup(this);
+                });
+            }
+
+            // 曜日グループを削除する関数
+            function removeDayTimeGroup(button) {
+                const group = button.closest('.day-time-group');
+                const container = document.getElementById('dayTimeContainer');
+                
+                // 最低1つはグループを残す
+                if (container.querySelectorAll('.day-time-group').length > 1) {
+                    group.remove();
+                } else {
+                    alert('最低1つの曜日は選択してください。');
                 }
-            });
-            
-            // バリデーション
-            if (!hasValidSelection) {
-                alert('少なくとも1つの曜日と時間帯を選択してください。');
-                return;
             }
-            
-            // 送信結果を表示（実際の実装では、ここでサーバーに送信）
-            console.log('送信データ:', data);
-            
-            // 確認メッセージ
-            let message = `以下の内容で送信しました：\n\n`;
-            message += `お名前: ${data.name}\n\n`;
-            message += `ご都合の良い日時:\n`;
-            
-            data.availability.forEach(item => {
-                message += `${item.day}: ${item.times.join(', ')}\n`;
+
+            // ページ読み込み時の初期化
+            document.addEventListener('DOMContentLoaded', function() {
+                // 曜日追加ボタンのイベントリスナー
+                document.getElementById('addDayBtn').addEventListener('click', addDayTimeGroup);
+
+                // 初期の削除ボタンのイベントリスナー
+                document.querySelectorAll('.remove-day-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        removeDayTimeGroup(this);
+                    });
+                });
+
+                // フォーム送信のイベントリスナー
+                document.getElementById('availabilityForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // フォームデータを収集
+                    const formData = new FormData(this);
+                    const data = {
+                        name: formData.get('name'),
+                        availability: [],
+                        comments: formData.get('comments')
+                    };
+                    
+                    // 各曜日グループのデータを収集
+                    const groups = document.querySelectorAll('.day-time-group');
+                    let hasValidSelection = false;
+                    
+                    groups.forEach(function(group) {
+                        const groupId = group.getAttribute('data-group-id');
+                        const day = formData.get('day_' + groupId);
+                        const times = formData.getAll('time_' + groupId);
+                        
+                        if (day && times.length > 0) {
+                            hasValidSelection = true;
+                            data.availability.push({
+                                day: day,
+                                times: times
+                            });
+                        }
+                    });
+                    
+                    // バリデーション
+                    if (!hasValidSelection) {
+                        alert('少なくとも1つの曜日と時間帯を選択してください。');
+                        return;
+                    }
+                    
+                    // 送信結果を表示（実際の実装では、ここでサーバーに送信）
+                    console.log('送信データ:', data);
+                    
+                    // 確認メッセージ
+                    let message = '以下の内容で送信しました：\n\n';
+                    message += 'お名前: ' + data.name + '\n\n';
+                    message += 'ご都合の良い日時:\n';
+                    
+                    data.availability.forEach(function(item) {
+                        message += item.day + ': ' + item.times.join(', ') + '\n';
+                    });
+                    
+                    if (data.comments) {
+                        message += '\nコメント: ' + data.comments;
+                    }
+                    
+                    alert(message);
+                    
+                    // フォームをリセット（必要に応じて）
+                    // this.reset();
+                });
             });
-            
-            if (data.comments) {
-                message += `\nコメント: ${data.comments}`;
-            }
-            
-            alert(message);
-            
-            // フォームをリセット（必要に応じて）
-            // this.reset();
-        });
+        })();
     </script>
 </body>
 </html>
