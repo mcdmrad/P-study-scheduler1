@@ -242,19 +242,11 @@
                 console.log('Sheet Name:', SHEET_NAME);
                 
                 const response = await fetch(url);
-                console.log('Response status:', response.status); // デバッグ追加
-                
-                const responseText = await response.text();
-                console.log('Response text:', responseText); // デバッグ追加
-                
-                if (!response.ok) {
-                    console.error('API Response:', responseText); // デバッグ用
-                    throw new Error('データの取得に失敗しました。スプレッドシートの共有設定を確認してください。');
-                }
-                
-                const data = JSON.parse(responseText);
-                console.log('Parsed data:', data); // デバッグ追加
-                const rows = data.values;
+               const data = await response.json();
+if (!data.success) {
+    throw new Error('データの取得に失敗しました');
+}
+const rows = data.data;
                 
                 if (!rows || rows.length < 2) {
                     throw new Error('データが見つかりません');
